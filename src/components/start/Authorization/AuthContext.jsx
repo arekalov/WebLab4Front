@@ -1,52 +1,47 @@
 import React, { createContext, useState, useContext } from "react";
-import {login, register} from "../../../data/Repository"
-import {OK, PASSWORDS_DIFFERENT_ERROR} from "../../../data/Strings.js";
+import { login, register } from "../../../data/Repository";
+import { OK, PASSWORDS_DIFFERENT_ERROR } from "../../../data/Strings.js";
+import SHA256 from "crypto-js/sha256";
 
 const AuthContext = createContext();
 
+const SALT_ROUNDS = 10;
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [userPassword, setUserPassword] = useState(null);
 
     const loginUser = async (username, password) => {
-        const response = await login(username, password)
+        const hashedPassword = SHA256(password).toString();
+        const response = await login(username, hashedPassword);
+        console.log(username, hashedPassword)
         if (response === OK) {
-            setUser(username)
-            setPassword(password)
+            setUser(username);
+            setUserPassword(hashedPassword);
         }
-        return response
+        return response;
     };
 
     const registerUser = async (username, password, passwordAgain) => {
         if (password !== passwordAgain) {
-            return PASSWORDS_DIFFERENT_ERROR
+            return PASSWORDS_DIFFERENT_ERROR;
         } else {
-            const response = await register(username, password)
+            // Хэшируем пароль перед отправкой на сервер
+            const hashedPassword = SHA256(password).toString();
+            const response = await register(username, hashedPassword);
+            console.log(username, hashedPassword)
             if (response === OK) {
-                setUser(username)
-                setPassword(password)
+                setUser(username);
+                setUserPassword(hashedPassword);
             }
-            return response
+            return response;
         }
-    }
-
-    const clearAllUser = () => async (username, password, passwordAgain) => {
-        if (password !== passwordAgain) {
-            return PASSWORDS_DIFFERENT_ERROR
-        } else {
-            const response = await register(username, password)
-            if (response === OK) {
-                setUser(username)
-                setPassword(password)
-            }
-            return response
-        }
-    }
+    };
 
     const logout = () => setUser(null);
 
     return (
-        <AuthContext.Provider value={{ user, password, login: loginUser, logout, register: registerUser }}>
+        <AuthContext.Provider value={{ user, password: userPassword, login: loginUser, logout, register: registerUser }}>
             {children}
         </AuthContext.Provider>
     );
