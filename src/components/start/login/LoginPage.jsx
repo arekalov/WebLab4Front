@@ -4,6 +4,7 @@ import {useAuth} from "../Authorization/AuthContext.jsx";
 import "./LoginPage.css"
 import {Button} from "../../core/Button/Button.jsx";
 import Header from "../Header/Header.jsx";
+import {OK} from "../../../data/Strings.js";
 
 export function LoginPage() {
     const [type, setType] = useState("register")
@@ -18,17 +19,18 @@ export function LoginPage() {
         setType("login")
     }, [])
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
         if (type === "login") {
-            if (auth.login(username, password)) {
+            const response = await auth.login(username, password);
+            if (response === OK) {
                 navigate("/main");
             } else {
-                setError("Неверный логин или пароль");
+                setError(response);
             }
         } else {
-            const registerRes = auth.register(username, password, passwordAgain)
-            if (registerRes === "") {
+            const registerRes =  await auth.register(username, password, passwordAgain)
+            if (registerRes === OK) {
                 navigate("/main")
             } else {
                 setError(registerRes)

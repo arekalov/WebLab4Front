@@ -1,34 +1,39 @@
 import React, { createContext, useState, useContext } from "react";
+import {login, register} from "../../../data/Repository"
+import {OK, PASSWORDS_DIFFERENT_ERROR} from "../../../data/Strings.js";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [password, setPassword] = useState(null);
 
-    const login = (username, password) => {
-        if (username === "admin" && password === "password") {
-            setUser({ name: username });
-            return true;
+    const loginUser = async (username, password) => {
+        const response = await login(username, password)
+        if (response === OK) {
+            setUser(username)
+            setPassword(password)
         }
-        return false;
+        return response
     };
 
-    const register = (username, password, passwordAgain) => {
+    const registerUser = async (username, password, passwordAgain) => {
         if (password !== passwordAgain) {
-            return "Пароли не совпадают"
-        } else if (false) {
-            return "Логин уже существует"
+            return PASSWORDS_DIFFERENT_ERROR
         } else {
-            // todo save to db
-            setUser({ name: username });
-            return ""
+            const response = await register(username, password)
+            if (response === OK) {
+                setUser(username)
+                setPassword(password)
+            }
+            return response
         }
     }
 
     const logout = () => setUser(null);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, register }}>
+        <AuthContext.Provider value={{ user, password, login: loginUser, logout, register: registerUser }}>
             {children}
         </AuthContext.Provider>
     );

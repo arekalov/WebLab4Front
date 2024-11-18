@@ -10,7 +10,7 @@ export function MainPage() {
 
     return (
         <div className="main-page">
-            <h2>Добро пожаловать, {user.name}!</h2>
+            <h2>Добро пожаловать, {user}!</h2>
             <div className="content-wrapper">
                 <div className="canvas-column">
                     <Canvas/>
