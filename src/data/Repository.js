@@ -63,3 +63,43 @@ export const getPoints = async (username, password) => {
         return ERROR
     }
 }
+
+export const clearPoints = async (username, password) => {
+    try {
+        const response = await fetch('http://localhost:8080/points/clearAll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': ' Basic YXJla2Fsb3Y6cXdlcnR5MTIzNA=='
+            },
+            body: JSON.stringify({ login:username, password:password }),
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return transformPoints(data);
+        }
+        return ERROR;
+    } catch (error) {
+        return ERROR
+    }
+}
+
+export const addPoint = async (username, password, x, y, r, time, result) => {
+    try {
+        const response = await fetch('http://localhost:8080/points/addPoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': ' Basic YXJla2Fsb3Y6cXdlcnR5MTIzNA=='
+            },
+            body: JSON.stringify({ login:username, password:password, x: x, y: y, r: r, time: time, result: result }),
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return transformPoints(data);
+        }
+        return ERROR;
+    } catch (error) {
+        return ERROR
+    }
+}

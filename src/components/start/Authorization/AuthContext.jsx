@@ -30,6 +30,19 @@ export function AuthProvider({ children }) {
         }
     }
 
+    const clearAllUser = () => async (username, password, passwordAgain) => {
+        if (password !== passwordAgain) {
+            return PASSWORDS_DIFFERENT_ERROR
+        } else {
+            const response = await register(username, password)
+            if (response === OK) {
+                setUser(username)
+                setPassword(password)
+            }
+            return response
+        }
+    }
+
     const logout = () => setUser(null);
 
     return (

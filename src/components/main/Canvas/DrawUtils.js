@@ -39,3 +39,22 @@ export const drawAxis = (ctx, width, height) => {
     ctx.strokeStyle = 'white';
     ctx.stroke();
 }
+
+export const drawAxisLabels = (ctx, width, height, dynamicScalingFactor, step = 0.5, range = [-2, 2]) => {
+    ctx.font = '8px Arial';
+    ctx.fillStyle = 'white';
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Подписи для оси X
+    for (let i = range[0]; i <= range[1]; i += step) {
+        const x = centerX + i * dynamicScalingFactor;
+        ctx.fillText(i.toFixed(1), x, centerY + 15);  // 15 - отступ от оси X
+    }
+
+    // Подписи для оси Y
+    for (let i = range[0]; i <= range[1]; i += step) {
+        const y = centerY - i * dynamicScalingFactor;  // Обратите внимание на знак
+        ctx.fillText(i.toFixed(1), centerX + 5, y);  // 5 - отступ от оси Y
+    }
+};
