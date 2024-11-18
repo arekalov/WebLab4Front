@@ -1,4 +1,5 @@
 import {AUTH_ERROR, ERROR, OK, USER_EXIST_ERROR} from "./Strings.js";
+import {transformPoints} from "./Util.js";
 
 export const login = async (username, password) => {
     try {
@@ -10,8 +11,6 @@ export const login = async (username, password) => {
             },
             body: JSON.stringify({ login:username, password:password }),
         });
-        console.log(JSON.stringify({ login:username, password:password }))
-
         if (response.ok) {
             return OK;
         }
@@ -35,8 +34,6 @@ export const register = async (username, password) => {
             },
             body: JSON.stringify({ login:username, password:password }),
         });
-        console.log(JSON.stringify({ login:username, password:password }))
-
         if (response.ok) {
             return OK;
         }
@@ -46,3 +43,23 @@ export const register = async (username, password) => {
     }
 }
 
+
+export const getPoints = async (username, password) => {
+    try {
+        const response = await fetch('http://localhost:8080/points/getAll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': ' Basic YXJla2Fsb3Y6cXdlcnR5MTIzNA=='
+            },
+            body: JSON.stringify({ login:username, password:password }),
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return transformPoints(data);
+        }
+        return ERROR;
+    } catch (error) {
+        return ERROR
+    }
+}
