@@ -1,18 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { drawAxis, drawAxisLabels, drawCircle, drawRectangle, drawTriangle } from "./DrawUtils.js";
+import {isPointInShape} from "../../../data/Util.js";
 
-export default function Canvas({ existedPoints, savePoint }) {
+export default function Canvas({ existedPoints, savePoint, radius }) {
     const canvasRef = useRef(null);
     const [points, setPoints] = useState(existedPoints || []);
 
-    let radius = 2;
     const width = 650;
     const height = 650;
 
-    // Масштабируем по диапазону -2 до 2 по осям X и Y
-    const dynamicScalingFactor = width / 4; // (Диапазон 4 единицы для -2 до 2)
+    const dynamicScalingFactor = width / 4;
 
-    const pointRadius = 5;
+    const pointRadius =  5;
 
     const drawElements = (ctx) => {
         drawAxis(ctx, width, height);
@@ -25,11 +24,10 @@ export default function Canvas({ existedPoints, savePoint }) {
     const drawPoints = (ctx, points) => {
         points.forEach(point => {
             ctx.beginPath();
-            ctx.arc(point.x * dynamicScalingFactor + width / 2,  // Переводим координаты в пиксели
-                height / 2 - point.y * dynamicScalingFactor,  // Переводим координаты в пиксели
+            ctx.arc(point.x * dynamicScalingFactor + width / 2,
+                height / 2 - point.y * dynamicScalingFactor,
                 pointRadius, 0, 2 * Math.PI);
-
-            ctx.fillStyle = 0 <= radius ? 'green' : 'red';
+            ctx.fillStyle = isPointInShape(point.x, point.y, radius, dynamicScalingFactor) ? 'green' : 'red';
 
             ctx.fill();
         });
@@ -42,8 +40,7 @@ export default function Canvas({ existedPoints, savePoint }) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawElements(ctx);
         drawPoints(ctx, points);
-        console.log(points);
-    }, [points, existedPoints]);
+    }, [points, existedPoints, radius]); // Добавлен radius в зависимость от useEffect
 
     const handleClick = (e) => {
         const canvas = canvasRef.current;
@@ -52,11 +49,9 @@ export default function Canvas({ existedPoints, savePoint }) {
         const y = (height / 2 - (e.clientY - rect.top)) / dynamicScalingFactor;  // инвертируем Y
 
         const time = Date.now();
-        const result = true;
-
+        const result = isPointInShape(x, y, radius, dynamicScalingFactor);
         savePoint(x, y, radius, time, result);
     };
-
 
     return (
         <div>

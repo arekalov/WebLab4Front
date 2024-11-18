@@ -1,8 +1,13 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./Slider.css";
 
-const Slider = ({title, values, onChange}) => {
-    const [currentIndex, setCurrentIndex] = useState(Math.floor(values.length / 2));
+
+const Slider = ({title, current, values, onChange}) => {
+    const [currentIndex, setCurrentIndex] = useState(current);
+
+    useEffect(() => {
+        handleSlide(values.indexOf(current))
+    }, [current])
 
     const handleSlide = (index) => {
         setCurrentIndex(index);
@@ -14,7 +19,7 @@ const Slider = ({title, values, onChange}) => {
     return (
         <div>
             <h3>{title}</h3>
-            <div className="value-slider">
+            <div className="value-szlider">
                 <div className="slider-track">
                     {values.map((value, index) => (
                         <div

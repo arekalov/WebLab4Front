@@ -11,6 +11,9 @@ import {ERROR, POINTS_LOADING_ERROR} from "../../../data/Strings.js";
 export function MainPage() {
     const auth = useAuth();
     const [points, setPoints] = useState([]);
+    const [xNow, setXNow] = useState(0);
+    const [yNow, setYNow] = useState(0);
+    const [rNow, setRNow] = useState(2);
 
     useEffect(() => {
         async function fetchPoints() {
@@ -34,7 +37,14 @@ export function MainPage() {
 
     const addPointUser = async (x, y, r, time, result) => {
         await addPoint(auth.user, auth.password, x, y, r, time, result);
-        setPoints(prevPoints => [...prevPoints, { x, y, r, time, result }]); // добавляем точку в состояние
+        setPoints(prevPoints => [...prevPoints, { x, y, r, time, result }]);
+    };
+
+    const addPointBySubmitButton = async () => {
+        const time = Date.now()
+        const result = false
+        await addPoint(auth.user, auth.password, xNow, yNow, rNow, time, result);
+        setPoints(prevPoints => [...prevPoints, { x: xNow, y: yNow, r: rNow, time, result }]);
     };
 
 return (
@@ -42,10 +52,11 @@ return (
             <h2>Добро пожаловать, {auth.user}!</h2>
             <div className="content-wrapper">
                 <div className="canvas-column">
-                    <Canvas existedPoints={points} savePoint={addPointUser}/>
+                    <Canvas existedPoints={points} radius={rNow} savePoint={addPointUser}/>
                 </div>
                 <div className="controls-column">
-                    <Controls/>
+                    <Controls x={xNow} y={yNow} r={rNow} xChange={setXNow} yChange={setYNow} rChange={setRNow}
+                              onSubmitClick={addPointBySubmitButton}/>
                 </div>
             </div>
             <Button onClick={clearAll}>Почистить точки</Button>
